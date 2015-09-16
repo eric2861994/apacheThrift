@@ -1,0 +1,27 @@
+Server harus menyediakan RPC ini:
+login(username): userID
+userID yang dikembalikan akan digunakan terus oleh client sampai dia logout.
+
+logout(userID)
+logout.
+
+changeNickname(userID, nickname)
+mengubah nickname dari user.
+
+joinChannel(userID, channelName)
+masuk sebuah channel.
+
+leaveChannel(userID, channelName)
+keluar dari sebuah channel
+
+getMessage(userID): messages
+meminta pesan untuk userID.
+
+sendMessage(userID, channel): messages
+mengirim pesan ke channel tertentu, sekaligus mendapatkan pesan.
+
+sendMessage(userID): messages
+mengirim pesan ke channel tertentu, sekaligus mendapatkan pesan.
+
+channelName tidak boleh ada spasi
+nickname tanpa spasi
