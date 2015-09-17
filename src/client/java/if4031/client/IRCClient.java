@@ -1,30 +1,74 @@
 package if4031.client;
 
+import if4031.client.command.IRCCommandFactory;
+
+import java.io.PrintStream;
 import java.util.Scanner;
 
-public class IRCClient {
-    public static String PROGRAM_NAME = "Apache Thrift IRC";
-    public static String WELCOME_MESSAGE = "Welcome to " + PROGRAM_NAME + "!\nEnter your nickname to login..\n";
-    public static String NICKNAME_PROMPT = "nickname: ";
+class IRCClient {
 
-    public void run() {
+    private final Scanner scanner;
+    private final PrintStream out;
+    private final IRCCommandFactory ircCommandFactory;
+
+    private IRCClient(Scanner _scanner, PrintStream _out, IRCCommandFactory _ircCommandFactory) {
+        scanner = _scanner;
+        out = _out;
+        ircCommandFactory = _ircCommandFactory;
+    }
+
+    private void run() {
         // welcome message
-        Scanner scin = new Scanner(System.in);
-        System.out.println(WELCOME_MESSAGE);
+        out.println(WELCOME_MESSAGE);
 
         String nickname;
         // TODO use regex, use better error handling
         do {
-            System.out.print(NICKNAME_PROMPT);
-            nickname = scin.nextLine();
+            out.print(NICKNAME_PROMPT);
+            nickname = scanner.nextLine();
         } while (nickname.contains(" "));
 
         // main loop
+        while (true) {
+            out.print(COMMAND_PROMPT);
+            String command = scanner.nextLine();
+            IRCCommandFactory.ParseResult parseResult = ircCommandFactory.parse(command);
+
+            IRCCommandFactory.ParseStatus status = parseResult.getStatus();
+            if (status == IRCCommandFactory.ParseStatus.EXIT) {
+                break;
+
+            }
+
+
+            if (status == IRCCommandFactory.ParseStatus.OK) {
+                out.println("command: " + parseResult.getCommand());
+
+            } else if (status == IRCCommandFactory.ParseStatus.IGNORE) {
+                // reprompt without any message
+
+            } else if (status == IRCCommandFactory.ParseStatus.ERROR) {
+                out.println("error: " + parseResult.getReason());
+            }
+        }
+
         // cleanup
     }
 
+    private static String PROGRAM_NAME = "Apache Thrift IRC";
+    private static String WELCOME_MESSAGE = "Welcome to " + PROGRAM_NAME + "!\nEnter your nickname to login..\n";
+    private static String NICKNAME_PROMPT = "nickname: ";
+    private static String COMMAND_PROMPT = ">> ";
+
+    private enum ClientState {
+        LOGGED_IN,
+        LOGGED_OUT
+    }
+
     public static void main(String[] args) {
-        IRCClient ircClient = new IRCClient();
+        Scanner scanner = new Scanner(System.in);
+        IRCCommandFactory ircCommandFactory = new IRCCommandFactory();
+        IRCClient ircClient = new IRCClient(scanner, System.out, ircCommandFactory);
         ircClient.run();
     }
 }
