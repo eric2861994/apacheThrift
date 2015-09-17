@@ -41,14 +41,14 @@ public class IRCService {
 
     /**
      * Mendapatkan userID, untuk seterusnya userID akan digunakan oleh client untuk melakukan request ke server.
-     * 
+     *
      * @param nickname
      */
     public int login(String nickname) throws org.apache.thrift.TException;
 
     /**
      * Mengubah nickname dari user.
-     * 
+     *
      * @param user
      * @param newNick
      */
@@ -58,7 +58,7 @@ public class IRCService {
 
     /**
      * Masuk sebuah channel.
-     * 
+     *
      * @param user
      * @param channel
      */
@@ -66,29 +66,31 @@ public class IRCService {
 
     /**
      * Meminta pesan
-     * 
+     *
      * @param user
      */
     public List<Message> getMessage(int user) throws org.apache.thrift.TException;
 
     /**
      * Mengirim pesan ke channel tertentu, sekaligus mendapatkan pesan.
-     * 
+     *
      * @param user
      * @param channel
+     * @param message
      */
-    public List<Message> sendMessageToChannel(int user, String channel) throws org.apache.thrift.TException;
+    public List<Message> sendMessageToChannel(int user, String channel, Message message) throws org.apache.thrift.TException;
 
     /**
      * Mengirim pesan ke channel semua channel yang didaftar oleh user, sekaligus mendapatkan pesan.
-     * 
+     *
      * @param user
+     * @param message
      */
-    public List<Message> sendMessage(int user) throws org.apache.thrift.TException;
+    public List<Message> sendMessage(int user, Message message) throws org.apache.thrift.TException;
 
     /**
      * Keluar dari sebuah channel.
-     * 
+     *
      * @param user
      * @param channel
      */
@@ -108,9 +110,9 @@ public class IRCService {
 
     public void getMessage(int user, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void sendMessageToChannel(int user, String channel, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+    public void sendMessageToChannel(int user, String channel, Message message, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void sendMessage(int user, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+    public void sendMessage(int user, Message message, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
     public void leaveChannel(int user, String channel, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
@@ -247,17 +249,18 @@ public class IRCService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "getMessage failed: unknown result");
     }
 
-    public List<Message> sendMessageToChannel(int user, String channel) throws org.apache.thrift.TException
+    public List<Message> sendMessageToChannel(int user, String channel, Message message) throws org.apache.thrift.TException
     {
-      send_sendMessageToChannel(user, channel);
+      send_sendMessageToChannel(user, channel, message);
       return recv_sendMessageToChannel();
     }
 
-    public void send_sendMessageToChannel(int user, String channel) throws org.apache.thrift.TException
+    public void send_sendMessageToChannel(int user, String channel, Message message) throws org.apache.thrift.TException
     {
       sendMessageToChannel_args args = new sendMessageToChannel_args();
       args.setUser(user);
       args.setChannel(channel);
+      args.setMessage(message);
       sendBase("sendMessageToChannel", args);
     }
 
@@ -271,16 +274,17 @@ public class IRCService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "sendMessageToChannel failed: unknown result");
     }
 
-    public List<Message> sendMessage(int user) throws org.apache.thrift.TException
+    public List<Message> sendMessage(int user, Message message) throws org.apache.thrift.TException
     {
-      send_sendMessage(user);
+      send_sendMessage(user, message);
       return recv_sendMessage();
     }
 
-    public void send_sendMessage(int user) throws org.apache.thrift.TException
+    public void send_sendMessage(int user, Message message) throws org.apache.thrift.TException
     {
       sendMessage_args args = new sendMessage_args();
       args.setUser(user);
+      args.setMessage(message);
       sendBase("sendMessage", args);
     }
 
@@ -499,9 +503,9 @@ public class IRCService {
       }
     }
 
-    public void sendMessageToChannel(int user, String channel, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+    public void sendMessageToChannel(int user, String channel, Message message, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      sendMessageToChannel_call method_call = new sendMessageToChannel_call(user, channel, resultHandler, this, ___protocolFactory, ___transport);
+      sendMessageToChannel_call method_call = new sendMessageToChannel_call(user, channel, message, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -509,10 +513,12 @@ public class IRCService {
     public static class sendMessageToChannel_call extends org.apache.thrift.async.TAsyncMethodCall {
       private int user;
       private String channel;
-      public sendMessageToChannel_call(int user, String channel, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      private Message message;
+      public sendMessageToChannel_call(int user, String channel, Message message, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.user = user;
         this.channel = channel;
+        this.message = message;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
@@ -520,6 +526,7 @@ public class IRCService {
         sendMessageToChannel_args args = new sendMessageToChannel_args();
         args.setUser(user);
         args.setChannel(channel);
+        args.setMessage(message);
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -534,24 +541,27 @@ public class IRCService {
       }
     }
 
-    public void sendMessage(int user, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+    public void sendMessage(int user, Message message, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      sendMessage_call method_call = new sendMessage_call(user, resultHandler, this, ___protocolFactory, ___transport);
+      sendMessage_call method_call = new sendMessage_call(user, message, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
     public static class sendMessage_call extends org.apache.thrift.async.TAsyncMethodCall {
       private int user;
-      public sendMessage_call(int user, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      private Message message;
+      public sendMessage_call(int user, Message message, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.user = user;
+        this.message = message;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
         prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("sendMessage", org.apache.thrift.protocol.TMessageType.CALL, 0));
         sendMessage_args args = new sendMessage_args();
         args.setUser(user);
+        args.setMessage(message);
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -742,7 +752,7 @@ public class IRCService {
 
       public sendMessageToChannel_result getResult(I iface, sendMessageToChannel_args args) throws org.apache.thrift.TException {
         sendMessageToChannel_result result = new sendMessageToChannel_result();
-        result.success = iface.sendMessageToChannel(args.user, args.channel);
+        result.success = iface.sendMessageToChannel(args.user, args.channel, args.message);
         return result;
       }
     }
@@ -762,7 +772,7 @@ public class IRCService {
 
       public sendMessage_result getResult(I iface, sendMessage_args args) throws org.apache.thrift.TException {
         sendMessage_result result = new sendMessage_result();
-        result.success = iface.sendMessage(args.user);
+        result.success = iface.sendMessage(args.user, args.message);
         return result;
       }
     }
@@ -822,7 +832,7 @@ public class IRCService {
 
       public AsyncMethodCallback<Integer> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
         final org.apache.thrift.AsyncProcessFunction fcall = this;
-        return new AsyncMethodCallback<Integer>() { 
+        return new AsyncMethodCallback<Integer>() {
           public void onComplete(Integer o) {
             login_result result = new login_result();
             result.success = o;
@@ -874,7 +884,7 @@ public class IRCService {
 
       public AsyncMethodCallback<Boolean> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
         final org.apache.thrift.AsyncProcessFunction fcall = this;
-        return new AsyncMethodCallback<Boolean>() { 
+        return new AsyncMethodCallback<Boolean>() {
           public void onComplete(Boolean o) {
             changeNickname_result result = new changeNickname_result();
             result.success = o;
@@ -926,7 +936,7 @@ public class IRCService {
 
       public AsyncMethodCallback<Void> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
         final org.apache.thrift.AsyncProcessFunction fcall = this;
-        return new AsyncMethodCallback<Void>() { 
+        return new AsyncMethodCallback<Void>() {
           public void onComplete(Void o) {
             logout_result result = new logout_result();
             try {
@@ -976,7 +986,7 @@ public class IRCService {
 
       public AsyncMethodCallback<Void> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
         final org.apache.thrift.AsyncProcessFunction fcall = this;
-        return new AsyncMethodCallback<Void>() { 
+        return new AsyncMethodCallback<Void>() {
           public void onComplete(Void o) {
             joinChannel_result result = new joinChannel_result();
             try {
@@ -1026,7 +1036,7 @@ public class IRCService {
 
       public AsyncMethodCallback<List<Message>> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
         final org.apache.thrift.AsyncProcessFunction fcall = this;
-        return new AsyncMethodCallback<List<Message>>() { 
+        return new AsyncMethodCallback<List<Message>>() {
           public void onComplete(List<Message> o) {
             getMessage_result result = new getMessage_result();
             result.success = o;
@@ -1077,7 +1087,7 @@ public class IRCService {
 
       public AsyncMethodCallback<List<Message>> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
         final org.apache.thrift.AsyncProcessFunction fcall = this;
-        return new AsyncMethodCallback<List<Message>>() { 
+        return new AsyncMethodCallback<List<Message>>() {
           public void onComplete(List<Message> o) {
             sendMessageToChannel_result result = new sendMessageToChannel_result();
             result.success = o;
@@ -1113,7 +1123,7 @@ public class IRCService {
       }
 
       public void start(I iface, sendMessageToChannel_args args, org.apache.thrift.async.AsyncMethodCallback<List<Message>> resultHandler) throws TException {
-        iface.sendMessageToChannel(args.user, args.channel,resultHandler);
+        iface.sendMessageToChannel(args.user, args.channel, args.message,resultHandler);
       }
     }
 
@@ -1128,7 +1138,7 @@ public class IRCService {
 
       public AsyncMethodCallback<List<Message>> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
         final org.apache.thrift.AsyncProcessFunction fcall = this;
-        return new AsyncMethodCallback<List<Message>>() { 
+        return new AsyncMethodCallback<List<Message>>() {
           public void onComplete(List<Message> o) {
             sendMessage_result result = new sendMessage_result();
             result.success = o;
@@ -1164,7 +1174,7 @@ public class IRCService {
       }
 
       public void start(I iface, sendMessage_args args, org.apache.thrift.async.AsyncMethodCallback<List<Message>> resultHandler) throws TException {
-        iface.sendMessage(args.user,resultHandler);
+        iface.sendMessage(args.user, args.message,resultHandler);
       }
     }
 
@@ -1179,7 +1189,7 @@ public class IRCService {
 
       public AsyncMethodCallback<Void> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
         final org.apache.thrift.AsyncProcessFunction fcall = this;
-        return new AsyncMethodCallback<Void>() { 
+        return new AsyncMethodCallback<Void>() {
           public void onComplete(Void o) {
             leaveChannel_result result = new leaveChannel_result();
             try {
@@ -1295,8 +1305,8 @@ public class IRCService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.NICKNAME, new org.apache.thrift.meta_data.FieldMetaData("nickname", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , "nickname")));
+      tmpMap.put(_Fields.NICKNAME, new org.apache.thrift.meta_data.FieldMetaData("nickname", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , "nickname")));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(login_args.class, metaDataMap);
     }
@@ -1305,7 +1315,7 @@ public class IRCService {
     }
 
     public login_args(
-      String nickname)
+            String nickname)
     {
       this();
       this.nickname = nickname;
@@ -1355,21 +1365,21 @@ public class IRCService {
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case NICKNAME:
-        if (value == null) {
-          unsetNickname();
-        } else {
-          setNickname((String)value);
-        }
-        break;
+        case NICKNAME:
+          if (value == null) {
+            unsetNickname();
+          } else {
+            setNickname((String)value);
+          }
+          break;
 
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case NICKNAME:
-        return getNickname();
+        case NICKNAME:
+          return getNickname();
 
       }
       throw new IllegalStateException();
@@ -1382,8 +1392,8 @@ public class IRCService {
       }
 
       switch (field) {
-      case NICKNAME:
-        return isSetNickname();
+        case NICKNAME:
+          return isSetNickname();
       }
       throw new IllegalStateException();
     }
@@ -1509,7 +1519,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -1517,7 +1527,7 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
                 struct.nickname = iprot.readString();
                 struct.setNicknameIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -1658,8 +1668,8 @@ public class IRCService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(login_result.class, metaDataMap);
     }
@@ -1668,7 +1678,7 @@ public class IRCService {
     }
 
     public login_result(
-      int success)
+            int success)
     {
       this();
       this.success = success;
@@ -1718,21 +1728,21 @@ public class IRCService {
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case SUCCESS:
-        if (value == null) {
-          unsetSuccess();
-        } else {
-          setSuccess((Integer)value);
-        }
-        break;
+        case SUCCESS:
+          if (value == null) {
+            unsetSuccess();
+          } else {
+            setSuccess((Integer)value);
+          }
+          break;
 
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case SUCCESS:
-        return Integer.valueOf(getSuccess());
+        case SUCCESS:
+          return Integer.valueOf(getSuccess());
 
       }
       throw new IllegalStateException();
@@ -1745,8 +1755,8 @@ public class IRCService {
       }
 
       switch (field) {
-      case SUCCESS:
-        return isSetSuccess();
+        case SUCCESS:
+          return isSetSuccess();
       }
       throw new IllegalStateException();
     }
@@ -1819,7 +1829,7 @@ public class IRCService {
 
     public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
-      }
+    }
 
     @Override
     public String toString() {
@@ -1870,7 +1880,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -1878,7 +1888,7 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.success = iprot.readI32();
                 struct.setSuccessIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -2024,10 +2034,10 @@ public class IRCService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
-      tmpMap.put(_Fields.NEW_NICK, new org.apache.thrift.meta_data.FieldMetaData("newNick", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , "nickname")));
+      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
+      tmpMap.put(_Fields.NEW_NICK, new org.apache.thrift.meta_data.FieldMetaData("newNick", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , "nickname")));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(changeNickname_args.class, metaDataMap);
     }
@@ -2036,8 +2046,8 @@ public class IRCService {
     }
 
     public changeNickname_args(
-      int user,
-      String newNick)
+            int user,
+            String newNick)
     {
       this();
       this.user = user;
@@ -2116,32 +2126,32 @@ public class IRCService {
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case USER:
-        if (value == null) {
-          unsetUser();
-        } else {
-          setUser((Integer)value);
-        }
-        break;
+        case USER:
+          if (value == null) {
+            unsetUser();
+          } else {
+            setUser((Integer)value);
+          }
+          break;
 
-      case NEW_NICK:
-        if (value == null) {
-          unsetNewNick();
-        } else {
-          setNewNick((String)value);
-        }
-        break;
+        case NEW_NICK:
+          if (value == null) {
+            unsetNewNick();
+          } else {
+            setNewNick((String)value);
+          }
+          break;
 
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case USER:
-        return Integer.valueOf(getUser());
+        case USER:
+          return Integer.valueOf(getUser());
 
-      case NEW_NICK:
-        return getNewNick();
+        case NEW_NICK:
+          return getNewNick();
 
       }
       throw new IllegalStateException();
@@ -2154,10 +2164,10 @@ public class IRCService {
       }
 
       switch (field) {
-      case USER:
-        return isSetUser();
-      case NEW_NICK:
-        return isSetNewNick();
+        case USER:
+          return isSetUser();
+        case NEW_NICK:
+          return isSetNewNick();
       }
       throw new IllegalStateException();
     }
@@ -2313,7 +2323,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -2321,7 +2331,7 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.user = iprot.readI32();
                 struct.setUserIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -2329,7 +2339,7 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
                 struct.newNick = iprot.readString();
                 struct.setNewNickIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -2483,8 +2493,8 @@ public class IRCService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(changeNickname_result.class, metaDataMap);
     }
@@ -2493,7 +2503,7 @@ public class IRCService {
     }
 
     public changeNickname_result(
-      boolean success)
+            boolean success)
     {
       this();
       this.success = success;
@@ -2543,21 +2553,21 @@ public class IRCService {
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case SUCCESS:
-        if (value == null) {
-          unsetSuccess();
-        } else {
-          setSuccess((Boolean)value);
-        }
-        break;
+        case SUCCESS:
+          if (value == null) {
+            unsetSuccess();
+          } else {
+            setSuccess((Boolean)value);
+          }
+          break;
 
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case SUCCESS:
-        return Boolean.valueOf(isSuccess());
+        case SUCCESS:
+          return Boolean.valueOf(isSuccess());
 
       }
       throw new IllegalStateException();
@@ -2570,8 +2580,8 @@ public class IRCService {
       }
 
       switch (field) {
-      case SUCCESS:
-        return isSetSuccess();
+        case SUCCESS:
+          return isSetSuccess();
       }
       throw new IllegalStateException();
     }
@@ -2644,7 +2654,7 @@ public class IRCService {
 
     public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
-      }
+    }
 
     @Override
     public String toString() {
@@ -2695,7 +2705,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -2703,7 +2713,7 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
                 struct.success = iprot.readBool();
                 struct.setSuccessIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -2844,8 +2854,8 @@ public class IRCService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
+      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(logout_args.class, metaDataMap);
     }
@@ -2854,7 +2864,7 @@ public class IRCService {
     }
 
     public logout_args(
-      int user)
+            int user)
     {
       this();
       this.user = user;
@@ -2904,21 +2914,21 @@ public class IRCService {
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case USER:
-        if (value == null) {
-          unsetUser();
-        } else {
-          setUser((Integer)value);
-        }
-        break;
+        case USER:
+          if (value == null) {
+            unsetUser();
+          } else {
+            setUser((Integer)value);
+          }
+          break;
 
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case USER:
-        return Integer.valueOf(getUser());
+        case USER:
+          return Integer.valueOf(getUser());
 
       }
       throw new IllegalStateException();
@@ -2931,8 +2941,8 @@ public class IRCService {
       }
 
       switch (field) {
-      case USER:
-        return isSetUser();
+        case USER:
+          return isSetUser();
       }
       throw new IllegalStateException();
     }
@@ -3056,7 +3066,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -3064,7 +3074,7 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.user = iprot.readI32();
                 struct.setUserIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -3139,7 +3149,7 @@ public class IRCService {
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-;
+      ;
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -3282,7 +3292,7 @@ public class IRCService {
 
     public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
-      }
+    }
 
     @Override
     public String toString() {
@@ -3328,7 +3338,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -3456,10 +3466,10 @@ public class IRCService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
-      tmpMap.put(_Fields.CHANNEL, new org.apache.thrift.meta_data.FieldMetaData("channel", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , "channelName")));
+      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
+      tmpMap.put(_Fields.CHANNEL, new org.apache.thrift.meta_data.FieldMetaData("channel", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , "channelName")));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(joinChannel_args.class, metaDataMap);
     }
@@ -3468,8 +3478,8 @@ public class IRCService {
     }
 
     public joinChannel_args(
-      int user,
-      String channel)
+            int user,
+            String channel)
     {
       this();
       this.user = user;
@@ -3548,32 +3558,32 @@ public class IRCService {
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case USER:
-        if (value == null) {
-          unsetUser();
-        } else {
-          setUser((Integer)value);
-        }
-        break;
+        case USER:
+          if (value == null) {
+            unsetUser();
+          } else {
+            setUser((Integer)value);
+          }
+          break;
 
-      case CHANNEL:
-        if (value == null) {
-          unsetChannel();
-        } else {
-          setChannel((String)value);
-        }
-        break;
+        case CHANNEL:
+          if (value == null) {
+            unsetChannel();
+          } else {
+            setChannel((String)value);
+          }
+          break;
 
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case USER:
-        return Integer.valueOf(getUser());
+        case USER:
+          return Integer.valueOf(getUser());
 
-      case CHANNEL:
-        return getChannel();
+        case CHANNEL:
+          return getChannel();
 
       }
       throw new IllegalStateException();
@@ -3586,10 +3596,10 @@ public class IRCService {
       }
 
       switch (field) {
-      case USER:
-        return isSetUser();
-      case CHANNEL:
-        return isSetChannel();
+        case USER:
+          return isSetUser();
+        case CHANNEL:
+          return isSetChannel();
       }
       throw new IllegalStateException();
     }
@@ -3745,7 +3755,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -3753,7 +3763,7 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.user = iprot.readI32();
                 struct.setUserIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -3761,7 +3771,7 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
                 struct.channel = iprot.readString();
                 struct.setChannelIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -3851,7 +3861,7 @@ public class IRCService {
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-;
+      ;
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -3994,7 +4004,7 @@ public class IRCService {
 
     public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
-      }
+    }
 
     @Override
     public String toString() {
@@ -4040,7 +4050,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -4163,8 +4173,8 @@ public class IRCService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
+      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(getMessage_args.class, metaDataMap);
     }
@@ -4173,7 +4183,7 @@ public class IRCService {
     }
 
     public getMessage_args(
-      int user)
+            int user)
     {
       this();
       this.user = user;
@@ -4223,21 +4233,21 @@ public class IRCService {
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case USER:
-        if (value == null) {
-          unsetUser();
-        } else {
-          setUser((Integer)value);
-        }
-        break;
+        case USER:
+          if (value == null) {
+            unsetUser();
+          } else {
+            setUser((Integer)value);
+          }
+          break;
 
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case USER:
-        return Integer.valueOf(getUser());
+        case USER:
+          return Integer.valueOf(getUser());
 
       }
       throw new IllegalStateException();
@@ -4250,8 +4260,8 @@ public class IRCService {
       }
 
       switch (field) {
-      case USER:
-        return isSetUser();
+        case USER:
+          return isSetUser();
       }
       throw new IllegalStateException();
     }
@@ -4375,7 +4385,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -4383,7 +4393,7 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.user = iprot.readI32();
                 struct.setUserIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -4520,8 +4530,8 @@ public class IRCService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.LIST          , "messages")));
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.LIST          , "messages")));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(getMessage_result.class, metaDataMap);
     }
@@ -4530,7 +4540,7 @@ public class IRCService {
     }
 
     public getMessage_result(
-      List<Message> success)
+            List<Message> success)
     {
       this();
       this.success = success;
@@ -4595,21 +4605,21 @@ public class IRCService {
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case SUCCESS:
-        if (value == null) {
-          unsetSuccess();
-        } else {
-          setSuccess((List<Message>)value);
-        }
-        break;
+        case SUCCESS:
+          if (value == null) {
+            unsetSuccess();
+          } else {
+            setSuccess((List<Message>)value);
+          }
+          break;
 
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case SUCCESS:
-        return getSuccess();
+        case SUCCESS:
+          return getSuccess();
 
       }
       throw new IllegalStateException();
@@ -4622,8 +4632,8 @@ public class IRCService {
       }
 
       switch (field) {
-      case SUCCESS:
-        return isSetSuccess();
+        case SUCCESS:
+          return isSetSuccess();
       }
       throw new IllegalStateException();
     }
@@ -4696,7 +4706,7 @@ public class IRCService {
 
     public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
-      }
+    }
 
     @Override
     public String toString() {
@@ -4749,7 +4759,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -4768,7 +4778,7 @@ public class IRCService {
                   iprot.readListEnd();
                 }
                 struct.setSuccessIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -4860,6 +4870,7 @@ public class IRCService {
 
     private static final org.apache.thrift.protocol.TField USER_FIELD_DESC = new org.apache.thrift.protocol.TField("user", org.apache.thrift.protocol.TType.I32, (short)1);
     private static final org.apache.thrift.protocol.TField CHANNEL_FIELD_DESC = new org.apache.thrift.protocol.TField("channel", org.apache.thrift.protocol.TType.STRING, (short)2);
+    private static final org.apache.thrift.protocol.TField MESSAGE_FIELD_DESC = new org.apache.thrift.protocol.TField("message", org.apache.thrift.protocol.TType.STRUCT, (short)3);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -4869,11 +4880,13 @@ public class IRCService {
 
     public int user; // required
     public String channel; // required
+    public Message message; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       USER((short)1, "user"),
-      CHANNEL((short)2, "channel");
+      CHANNEL((short)2, "channel"),
+      MESSAGE((short)3, "message");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -4892,6 +4905,8 @@ public class IRCService {
             return USER;
           case 2: // CHANNEL
             return CHANNEL;
+          case 3: // MESSAGE
+            return MESSAGE;
           default:
             return null;
         }
@@ -4937,10 +4952,12 @@ public class IRCService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
-      tmpMap.put(_Fields.CHANNEL, new org.apache.thrift.meta_data.FieldMetaData("channel", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , "channelName")));
+      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
+      tmpMap.put(_Fields.CHANNEL, new org.apache.thrift.meta_data.FieldMetaData("channel", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , "channelName")));
+      tmpMap.put(_Fields.MESSAGE, new org.apache.thrift.meta_data.FieldMetaData("message", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Message.class)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(sendMessageToChannel_args.class, metaDataMap);
     }
@@ -4949,13 +4966,15 @@ public class IRCService {
     }
 
     public sendMessageToChannel_args(
-      int user,
-      String channel)
+            int user,
+            String channel,
+            Message message)
     {
       this();
       this.user = user;
       setUserIsSet(true);
       this.channel = channel;
+      this.message = message;
     }
 
     /**
@@ -4966,6 +4985,9 @@ public class IRCService {
       this.user = other.user;
       if (other.isSetChannel()) {
         this.channel = other.channel;
+      }
+      if (other.isSetMessage()) {
+        this.message = new Message(other.message);
       }
     }
 
@@ -4978,6 +5000,7 @@ public class IRCService {
       setUserIsSet(false);
       this.user = 0;
       this.channel = null;
+      this.message = null;
     }
 
     public int getUser() {
@@ -5027,34 +5050,69 @@ public class IRCService {
       }
     }
 
+    public Message getMessage() {
+      return this.message;
+    }
+
+    public sendMessageToChannel_args setMessage(Message message) {
+      this.message = message;
+      return this;
+    }
+
+    public void unsetMessage() {
+      this.message = null;
+    }
+
+    /** Returns true if field message is set (has been assigned a value) and false otherwise */
+    public boolean isSetMessage() {
+      return this.message != null;
+    }
+
+    public void setMessageIsSet(boolean value) {
+      if (!value) {
+        this.message = null;
+      }
+    }
+
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case USER:
-        if (value == null) {
-          unsetUser();
-        } else {
-          setUser((Integer)value);
-        }
-        break;
+        case USER:
+          if (value == null) {
+            unsetUser();
+          } else {
+            setUser((Integer)value);
+          }
+          break;
 
-      case CHANNEL:
-        if (value == null) {
-          unsetChannel();
-        } else {
-          setChannel((String)value);
-        }
-        break;
+        case CHANNEL:
+          if (value == null) {
+            unsetChannel();
+          } else {
+            setChannel((String)value);
+          }
+          break;
+
+        case MESSAGE:
+          if (value == null) {
+            unsetMessage();
+          } else {
+            setMessage((Message)value);
+          }
+          break;
 
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case USER:
-        return Integer.valueOf(getUser());
+        case USER:
+          return Integer.valueOf(getUser());
 
-      case CHANNEL:
-        return getChannel();
+        case CHANNEL:
+          return getChannel();
+
+        case MESSAGE:
+          return getMessage();
 
       }
       throw new IllegalStateException();
@@ -5067,10 +5125,12 @@ public class IRCService {
       }
 
       switch (field) {
-      case USER:
-        return isSetUser();
-      case CHANNEL:
-        return isSetChannel();
+        case USER:
+          return isSetUser();
+        case CHANNEL:
+          return isSetChannel();
+        case MESSAGE:
+          return isSetMessage();
       }
       throw new IllegalStateException();
     }
@@ -5106,6 +5166,15 @@ public class IRCService {
           return false;
       }
 
+      boolean this_present_message = true && this.isSetMessage();
+      boolean that_present_message = true && that.isSetMessage();
+      if (this_present_message || that_present_message) {
+        if (!(this_present_message && that_present_message))
+          return false;
+        if (!this.message.equals(that.message))
+          return false;
+      }
+
       return true;
     }
 
@@ -5122,6 +5191,11 @@ public class IRCService {
       list.add(present_channel);
       if (present_channel)
         list.add(channel);
+
+      boolean present_message = true && (isSetMessage());
+      list.add(present_message);
+      if (present_message)
+        list.add(message);
 
       return list.hashCode();
     }
@@ -5150,6 +5224,16 @@ public class IRCService {
       }
       if (isSetChannel()) {
         lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.channel, other.channel);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetMessage()).compareTo(other.isSetMessage());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetMessage()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.message, other.message);
         if (lastComparison != 0) {
           return lastComparison;
         }
@@ -5185,6 +5269,14 @@ public class IRCService {
         sb.append(this.channel);
       }
       first = false;
+      if (!first) sb.append(", ");
+      sb.append("message:");
+      if (this.message == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.message);
+      }
+      first = false;
       sb.append(")");
       return sb.toString();
     }
@@ -5192,6 +5284,9 @@ public class IRCService {
     public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
+      if (message != null) {
+        message.validate();
+      }
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -5226,7 +5321,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -5234,7 +5329,7 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.user = iprot.readI32();
                 struct.setUserIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -5242,7 +5337,16 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
                 struct.channel = iprot.readString();
                 struct.setChannelIsSet(true);
-              } else { 
+              } else {
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // MESSAGE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.message = new Message();
+                struct.message.read(iprot);
+                struct.setMessageIsSet(true);
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -5269,6 +5373,11 @@ public class IRCService {
           oprot.writeString(struct.channel);
           oprot.writeFieldEnd();
         }
+        if (struct.message != null) {
+          oprot.writeFieldBegin(MESSAGE_FIELD_DESC);
+          struct.message.write(oprot);
+          oprot.writeFieldEnd();
+        }
         oprot.writeFieldStop();
         oprot.writeStructEnd();
       }
@@ -5293,19 +5402,25 @@ public class IRCService {
         if (struct.isSetChannel()) {
           optionals.set(1);
         }
-        oprot.writeBitSet(optionals, 2);
+        if (struct.isSetMessage()) {
+          optionals.set(2);
+        }
+        oprot.writeBitSet(optionals, 3);
         if (struct.isSetUser()) {
           oprot.writeI32(struct.user);
         }
         if (struct.isSetChannel()) {
           oprot.writeString(struct.channel);
         }
+        if (struct.isSetMessage()) {
+          struct.message.write(oprot);
+        }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, sendMessageToChannel_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(2);
+        BitSet incoming = iprot.readBitSet(3);
         if (incoming.get(0)) {
           struct.user = iprot.readI32();
           struct.setUserIsSet(true);
@@ -5313,6 +5428,11 @@ public class IRCService {
         if (incoming.get(1)) {
           struct.channel = iprot.readString();
           struct.setChannelIsSet(true);
+        }
+        if (incoming.get(2)) {
+          struct.message = new Message();
+          struct.message.read(iprot);
+          struct.setMessageIsSet(true);
         }
       }
     }
@@ -5394,8 +5514,8 @@ public class IRCService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.LIST          , "messages")));
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.LIST          , "messages")));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(sendMessageToChannel_result.class, metaDataMap);
     }
@@ -5404,7 +5524,7 @@ public class IRCService {
     }
 
     public sendMessageToChannel_result(
-      List<Message> success)
+            List<Message> success)
     {
       this();
       this.success = success;
@@ -5469,21 +5589,21 @@ public class IRCService {
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case SUCCESS:
-        if (value == null) {
-          unsetSuccess();
-        } else {
-          setSuccess((List<Message>)value);
-        }
-        break;
+        case SUCCESS:
+          if (value == null) {
+            unsetSuccess();
+          } else {
+            setSuccess((List<Message>)value);
+          }
+          break;
 
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case SUCCESS:
-        return getSuccess();
+        case SUCCESS:
+          return getSuccess();
 
       }
       throw new IllegalStateException();
@@ -5496,8 +5616,8 @@ public class IRCService {
       }
 
       switch (field) {
-      case SUCCESS:
-        return isSetSuccess();
+        case SUCCESS:
+          return isSetSuccess();
       }
       throw new IllegalStateException();
     }
@@ -5570,7 +5690,7 @@ public class IRCService {
 
     public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
-      }
+    }
 
     @Override
     public String toString() {
@@ -5623,7 +5743,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -5642,7 +5762,7 @@ public class IRCService {
                   iprot.readListEnd();
                 }
                 struct.setSuccessIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -5733,6 +5853,7 @@ public class IRCService {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("sendMessage_args");
 
     private static final org.apache.thrift.protocol.TField USER_FIELD_DESC = new org.apache.thrift.protocol.TField("user", org.apache.thrift.protocol.TType.I32, (short)1);
+    private static final org.apache.thrift.protocol.TField MESSAGE_FIELD_DESC = new org.apache.thrift.protocol.TField("message", org.apache.thrift.protocol.TType.STRUCT, (short)2);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -5741,10 +5862,12 @@ public class IRCService {
     }
 
     public int user; // required
+    public Message message; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-      USER((short)1, "user");
+      USER((short)1, "user"),
+      MESSAGE((short)2, "message");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -5761,6 +5884,8 @@ public class IRCService {
         switch(fieldId) {
           case 1: // USER
             return USER;
+          case 2: // MESSAGE
+            return MESSAGE;
           default:
             return null;
         }
@@ -5806,8 +5931,10 @@ public class IRCService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
+      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
+      tmpMap.put(_Fields.MESSAGE, new org.apache.thrift.meta_data.FieldMetaData("message", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Message.class)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(sendMessage_args.class, metaDataMap);
     }
@@ -5816,11 +5943,13 @@ public class IRCService {
     }
 
     public sendMessage_args(
-      int user)
+            int user,
+            Message message)
     {
       this();
       this.user = user;
       setUserIsSet(true);
+      this.message = message;
     }
 
     /**
@@ -5829,6 +5958,9 @@ public class IRCService {
     public sendMessage_args(sendMessage_args other) {
       __isset_bitfield = other.__isset_bitfield;
       this.user = other.user;
+      if (other.isSetMessage()) {
+        this.message = new Message(other.message);
+      }
     }
 
     public sendMessage_args deepCopy() {
@@ -5839,6 +5971,7 @@ public class IRCService {
     public void clear() {
       setUserIsSet(false);
       this.user = 0;
+      this.message = null;
     }
 
     public int getUser() {
@@ -5864,23 +5997,58 @@ public class IRCService {
       __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __USER_ISSET_ID, value);
     }
 
+    public Message getMessage() {
+      return this.message;
+    }
+
+    public sendMessage_args setMessage(Message message) {
+      this.message = message;
+      return this;
+    }
+
+    public void unsetMessage() {
+      this.message = null;
+    }
+
+    /** Returns true if field message is set (has been assigned a value) and false otherwise */
+    public boolean isSetMessage() {
+      return this.message != null;
+    }
+
+    public void setMessageIsSet(boolean value) {
+      if (!value) {
+        this.message = null;
+      }
+    }
+
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case USER:
-        if (value == null) {
-          unsetUser();
-        } else {
-          setUser((Integer)value);
-        }
-        break;
+        case USER:
+          if (value == null) {
+            unsetUser();
+          } else {
+            setUser((Integer)value);
+          }
+          break;
+
+        case MESSAGE:
+          if (value == null) {
+            unsetMessage();
+          } else {
+            setMessage((Message)value);
+          }
+          break;
 
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case USER:
-        return Integer.valueOf(getUser());
+        case USER:
+          return Integer.valueOf(getUser());
+
+        case MESSAGE:
+          return getMessage();
 
       }
       throw new IllegalStateException();
@@ -5893,8 +6061,10 @@ public class IRCService {
       }
 
       switch (field) {
-      case USER:
-        return isSetUser();
+        case USER:
+          return isSetUser();
+        case MESSAGE:
+          return isSetMessage();
       }
       throw new IllegalStateException();
     }
@@ -5921,6 +6091,15 @@ public class IRCService {
           return false;
       }
 
+      boolean this_present_message = true && this.isSetMessage();
+      boolean that_present_message = true && that.isSetMessage();
+      if (this_present_message || that_present_message) {
+        if (!(this_present_message && that_present_message))
+          return false;
+        if (!this.message.equals(that.message))
+          return false;
+      }
+
       return true;
     }
 
@@ -5932,6 +6111,11 @@ public class IRCService {
       list.add(present_user);
       if (present_user)
         list.add(user);
+
+      boolean present_message = true && (isSetMessage());
+      list.add(present_message);
+      if (present_message)
+        list.add(message);
 
       return list.hashCode();
     }
@@ -5950,6 +6134,16 @@ public class IRCService {
       }
       if (isSetUser()) {
         lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.user, other.user);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetMessage()).compareTo(other.isSetMessage());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetMessage()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.message, other.message);
         if (lastComparison != 0) {
           return lastComparison;
         }
@@ -5977,6 +6171,14 @@ public class IRCService {
       sb.append("user:");
       sb.append(this.user);
       first = false;
+      if (!first) sb.append(", ");
+      sb.append("message:");
+      if (this.message == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.message);
+      }
+      first = false;
       sb.append(")");
       return sb.toString();
     }
@@ -5984,6 +6186,9 @@ public class IRCService {
     public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
+      if (message != null) {
+        message.validate();
+      }
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -6018,7 +6223,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -6026,7 +6231,16 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.user = iprot.readI32();
                 struct.setUserIsSet(true);
-              } else { 
+              } else {
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // MESSAGE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.message = new Message();
+                struct.message.read(iprot);
+                struct.setMessageIsSet(true);
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -6048,6 +6262,11 @@ public class IRCService {
         oprot.writeFieldBegin(USER_FIELD_DESC);
         oprot.writeI32(struct.user);
         oprot.writeFieldEnd();
+        if (struct.message != null) {
+          oprot.writeFieldBegin(MESSAGE_FIELD_DESC);
+          struct.message.write(oprot);
+          oprot.writeFieldEnd();
+        }
         oprot.writeFieldStop();
         oprot.writeStructEnd();
       }
@@ -6069,19 +6288,30 @@ public class IRCService {
         if (struct.isSetUser()) {
           optionals.set(0);
         }
-        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetMessage()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
         if (struct.isSetUser()) {
           oprot.writeI32(struct.user);
+        }
+        if (struct.isSetMessage()) {
+          struct.message.write(oprot);
         }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, sendMessage_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(1);
+        BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
           struct.user = iprot.readI32();
           struct.setUserIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.message = new Message();
+          struct.message.read(iprot);
+          struct.setMessageIsSet(true);
         }
       }
     }
@@ -6163,8 +6393,8 @@ public class IRCService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.LIST          , "messages")));
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.LIST          , "messages")));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(sendMessage_result.class, metaDataMap);
     }
@@ -6173,7 +6403,7 @@ public class IRCService {
     }
 
     public sendMessage_result(
-      List<Message> success)
+            List<Message> success)
     {
       this();
       this.success = success;
@@ -6238,21 +6468,21 @@ public class IRCService {
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case SUCCESS:
-        if (value == null) {
-          unsetSuccess();
-        } else {
-          setSuccess((List<Message>)value);
-        }
-        break;
+        case SUCCESS:
+          if (value == null) {
+            unsetSuccess();
+          } else {
+            setSuccess((List<Message>)value);
+          }
+          break;
 
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case SUCCESS:
-        return getSuccess();
+        case SUCCESS:
+          return getSuccess();
 
       }
       throw new IllegalStateException();
@@ -6265,8 +6495,8 @@ public class IRCService {
       }
 
       switch (field) {
-      case SUCCESS:
-        return isSetSuccess();
+        case SUCCESS:
+          return isSetSuccess();
       }
       throw new IllegalStateException();
     }
@@ -6339,7 +6569,7 @@ public class IRCService {
 
     public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
-      }
+    }
 
     @Override
     public String toString() {
@@ -6392,7 +6622,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -6411,7 +6641,7 @@ public class IRCService {
                   iprot.readListEnd();
                 }
                 struct.setSuccessIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -6580,10 +6810,10 @@ public class IRCService {
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
-      tmpMap.put(_Fields.CHANNEL, new org.apache.thrift.meta_data.FieldMetaData("channel", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , "channelName")));
+      tmpMap.put(_Fields.USER, new org.apache.thrift.meta_data.FieldMetaData("user", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32          , "userID")));
+      tmpMap.put(_Fields.CHANNEL, new org.apache.thrift.meta_data.FieldMetaData("channel", org.apache.thrift.TFieldRequirementType.DEFAULT,
+              new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING          , "channelName")));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(leaveChannel_args.class, metaDataMap);
     }
@@ -6592,8 +6822,8 @@ public class IRCService {
     }
 
     public leaveChannel_args(
-      int user,
-      String channel)
+            int user,
+            String channel)
     {
       this();
       this.user = user;
@@ -6672,32 +6902,32 @@ public class IRCService {
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
-      case USER:
-        if (value == null) {
-          unsetUser();
-        } else {
-          setUser((Integer)value);
-        }
-        break;
+        case USER:
+          if (value == null) {
+            unsetUser();
+          } else {
+            setUser((Integer)value);
+          }
+          break;
 
-      case CHANNEL:
-        if (value == null) {
-          unsetChannel();
-        } else {
-          setChannel((String)value);
-        }
-        break;
+        case CHANNEL:
+          if (value == null) {
+            unsetChannel();
+          } else {
+            setChannel((String)value);
+          }
+          break;
 
       }
     }
 
     public Object getFieldValue(_Fields field) {
       switch (field) {
-      case USER:
-        return Integer.valueOf(getUser());
+        case USER:
+          return Integer.valueOf(getUser());
 
-      case CHANNEL:
-        return getChannel();
+        case CHANNEL:
+          return getChannel();
 
       }
       throw new IllegalStateException();
@@ -6710,10 +6940,10 @@ public class IRCService {
       }
 
       switch (field) {
-      case USER:
-        return isSetUser();
-      case CHANNEL:
-        return isSetChannel();
+        case USER:
+          return isSetUser();
+        case CHANNEL:
+          return isSetChannel();
       }
       throw new IllegalStateException();
     }
@@ -6869,7 +7099,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {
@@ -6877,7 +7107,7 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.user = iprot.readI32();
                 struct.setUserIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -6885,7 +7115,7 @@ public class IRCService {
               if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
                 struct.channel = iprot.readString();
                 struct.setChannelIsSet(true);
-              } else { 
+              } else {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
@@ -6975,7 +7205,7 @@ public class IRCService {
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-;
+      ;
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -7118,7 +7348,7 @@ public class IRCService {
 
     public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
       schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
-      }
+    }
 
     @Override
     public String toString() {
@@ -7164,7 +7394,7 @@ public class IRCService {
         while (true)
         {
           schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
             break;
           }
           switch (schemeField.id) {

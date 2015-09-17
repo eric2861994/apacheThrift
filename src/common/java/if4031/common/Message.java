@@ -127,14 +127,14 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-    tmpMap.put(_Fields.SENDER, new org.apache.thrift.meta_data.FieldMetaData("sender", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING        , "nickname")));
-    tmpMap.put(_Fields.CHANNEL, new org.apache.thrift.meta_data.FieldMetaData("channel", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING        , "channelName")));
-    tmpMap.put(_Fields.BODY, new org.apache.thrift.meta_data.FieldMetaData("body", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
-    tmpMap.put(_Fields.SEND_TIME, new org.apache.thrift.meta_data.FieldMetaData("sendTime", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64        , "timestamp")));
+    tmpMap.put(_Fields.SENDER, new org.apache.thrift.meta_data.FieldMetaData("sender", org.apache.thrift.TFieldRequirementType.DEFAULT,
+            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING        , "nickname")));
+    tmpMap.put(_Fields.CHANNEL, new org.apache.thrift.meta_data.FieldMetaData("channel", org.apache.thrift.TFieldRequirementType.DEFAULT,
+            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING        , "channelName")));
+    tmpMap.put(_Fields.BODY, new org.apache.thrift.meta_data.FieldMetaData("body", org.apache.thrift.TFieldRequirementType.DEFAULT,
+            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.SEND_TIME, new org.apache.thrift.meta_data.FieldMetaData("sendTime", org.apache.thrift.TFieldRequirementType.DEFAULT,
+            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64        , "timestamp")));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(Message.class, metaDataMap);
   }
@@ -143,10 +143,10 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
   }
 
   public Message(
-    String sender,
-    String channel,
-    String body,
-    long sendTime)
+          String sender,
+          String channel,
+          String body,
+          long sendTime)
   {
     this();
     this.sender = sender;
@@ -283,54 +283,54 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
 
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
-    case SENDER:
-      if (value == null) {
-        unsetSender();
-      } else {
-        setSender((String)value);
-      }
-      break;
+      case SENDER:
+        if (value == null) {
+          unsetSender();
+        } else {
+          setSender((String)value);
+        }
+        break;
 
-    case CHANNEL:
-      if (value == null) {
-        unsetChannel();
-      } else {
-        setChannel((String)value);
-      }
-      break;
+      case CHANNEL:
+        if (value == null) {
+          unsetChannel();
+        } else {
+          setChannel((String)value);
+        }
+        break;
 
-    case BODY:
-      if (value == null) {
-        unsetBody();
-      } else {
-        setBody((String)value);
-      }
-      break;
+      case BODY:
+        if (value == null) {
+          unsetBody();
+        } else {
+          setBody((String)value);
+        }
+        break;
 
-    case SEND_TIME:
-      if (value == null) {
-        unsetSendTime();
-      } else {
-        setSendTime((Long)value);
-      }
-      break;
+      case SEND_TIME:
+        if (value == null) {
+          unsetSendTime();
+        } else {
+          setSendTime((Long)value);
+        }
+        break;
 
     }
   }
 
   public Object getFieldValue(_Fields field) {
     switch (field) {
-    case SENDER:
-      return getSender();
+      case SENDER:
+        return getSender();
 
-    case CHANNEL:
-      return getChannel();
+      case CHANNEL:
+        return getChannel();
 
-    case BODY:
-      return getBody();
+      case BODY:
+        return getBody();
 
-    case SEND_TIME:
-      return Long.valueOf(getSendTime());
+      case SEND_TIME:
+        return Long.valueOf(getSendTime());
 
     }
     throw new IllegalStateException();
@@ -343,14 +343,14 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
     }
 
     switch (field) {
-    case SENDER:
-      return isSetSender();
-    case CHANNEL:
-      return isSetChannel();
-    case BODY:
-      return isSetBody();
-    case SEND_TIME:
-      return isSetSendTime();
+      case SENDER:
+        return isSetSender();
+      case CHANNEL:
+        return isSetChannel();
+      case BODY:
+        return isSetBody();
+      case SEND_TIME:
+        return isSetSendTime();
     }
     throw new IllegalStateException();
   }
@@ -570,7 +570,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       while (true)
       {
         schemeField = iprot.readFieldBegin();
-        if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+        if (schemeField.type == org.apache.thrift.protocol.TType.STOP) {
           break;
         }
         switch (schemeField.id) {
@@ -578,7 +578,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
             if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
               struct.sender = iprot.readString();
               struct.setSenderIsSet(true);
-            } else { 
+            } else {
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
@@ -586,7 +586,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
             if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
               struct.channel = iprot.readString();
               struct.setChannelIsSet(true);
-            } else { 
+            } else {
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
@@ -594,7 +594,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
             if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
               struct.body = iprot.readString();
               struct.setBodyIsSet(true);
-            } else { 
+            } else {
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
@@ -602,7 +602,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
             if (schemeField.type == org.apache.thrift.protocol.TType.I64) {
               struct.sendTime = iprot.readI64();
               struct.setSendTimeIsSet(true);
-            } else { 
+            } else {
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;

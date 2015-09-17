@@ -26,9 +26,9 @@ service IRCService {
     /** Meminta pesan */
     messages getMessage(1:userID user),
     /** Mengirim pesan ke channel tertentu, sekaligus mendapatkan pesan. */
-    messages sendMessageToChannel(1:userID user, 2:channelName channel),
+    messages sendMessageToChannel(1:userID user, 2:channelName channel, 3:Message message),
     /** Mengirim pesan ke channel semua channel yang didaftar oleh user, sekaligus mendapatkan pesan. */
-    messages sendMessage(1:userID user),
+    messages sendMessage(1:userID user, 2:Message message),
     /** Keluar dari sebuah channel. */
     void leaveChannel(1:userID user, 2:channelName channel)
 }
