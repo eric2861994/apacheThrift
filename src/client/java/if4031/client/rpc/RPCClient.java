@@ -2,7 +2,7 @@ package if4031.client.rpc;
 
 import java.util.List;
 
-interface RPCClient {
+public interface RPCClient {
 
     /**
      * Get userID, this userID will be used for future requests.

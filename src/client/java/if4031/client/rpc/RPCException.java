@@ -1,6 +1,6 @@
 package if4031.client.rpc;
 
-class RPCException extends Exception {
+public class RPCException extends Exception {
     public RPCException() {
     }
 

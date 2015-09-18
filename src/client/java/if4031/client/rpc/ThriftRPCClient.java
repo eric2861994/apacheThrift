@@ -6,11 +6,11 @@ import org.apache.thrift.TException;
 import java.util.ArrayList;
 import java.util.List;
 
-class ThriftRPCClient implements RPCClient {
+public class ThriftRPCClient implements RPCClient {
 
     private final IRCService.Client thriftClient;
 
-    ThriftRPCClient(IRCService.Client _thriftClient) {
+    public ThriftRPCClient(IRCService.Client _thriftClient) {
         thriftClient = _thriftClient;
     }
 
