@@ -6,8 +6,6 @@ import org.apache.thrift.TException;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO handle exceptional cases
-
 class ThriftRPCClient implements RPCClient {
 
     private final IRCService.Client thriftClient;
@@ -55,30 +53,47 @@ class ThriftRPCClient implements RPCClient {
     /**
      * Changes remote messages to local messages.
      *
-     * @param serverMessages remote messages
+     * @param remoteMessages remote messages
      * @return local messages
      */
-    private List<Message> remoteToLocalMessages(List<if4031.common.Message> serverMessages) {
-        List<Message> clientMessages = new ArrayList<>();
-        for (if4031.common.Message oneServerMessage: serverMessages) {
-            Message oneClientMessage = new Message(
-                    oneServerMessage.getSender(),
-                    oneServerMessage.getChannel(),
-                    oneServerMessage.getBody(),
-                    oneServerMessage.getSendTime()
+    private List<Message> remoteToLocalMessages(List<if4031.common.Message> remoteMessages) {
+        List<Message> localMessages = new ArrayList<>();
+        for (if4031.common.Message oneRemoteMessage : remoteMessages) {
+            Message oneLocalMessage = new Message(
+                    oneRemoteMessage.getSender(),
+                    oneRemoteMessage.getChannel(),
+                    oneRemoteMessage.getBody(),
+                    oneRemoteMessage.getSendTime()
             );
-            clientMessages.add(oneClientMessage);
+            localMessages.add(oneLocalMessage);
         }
 
-        return clientMessages;
+        return localMessages;
     }
 
     @Override
     public List<Message> getMessages(int user) throws RPCException {
         try {
-            List<if4031.common.Message> serverMessages = thriftClient.getMessage(user);
+            List<if4031.common.Message> remoteMessages = thriftClient.getMessage(user);
 
-            return remoteToLocalMessages(serverMessages);
+            return remoteToLocalMessages(remoteMessages);
+
+        } catch (TException e) {
+            throw new RPCException(e);
+        }
+    }
+
+    private if4031.common.Message stringToRemoteMessage(String message) {
+        return new if4031.common.Message("", "", message, 0);
+    }
+
+    @Override
+    public List<Message> sendMessageToChannel(int user, String channel, String message) throws RPCException {
+        if4031.common.Message sendMessage = stringToRemoteMessage(message);
+        try {
+            List<if4031.common.Message> remoteMessages = thriftClient.sendMessageToChannel(user, channel, sendMessage);
+
+            return remoteToLocalMessages(remoteMessages);
 
         } catch (TException e) {
             throw new RPCException(e);
@@ -86,18 +101,24 @@ class ThriftRPCClient implements RPCClient {
     }
 
     @Override
-    public List<Message> sendMessageToChannel(int user, String channel, String message) throws RPCException {
-        if4031.common.Message clientMessage = new if4031.common.Message("", channel, message, 0);
-        thriftClient.sendMessageToChannel(user, channel, message);
-    }
-
-    @Override
     public List<Message> sendMessage(int user, String message) throws RPCException {
-        return null;
+        if4031.common.Message sendMessage = stringToRemoteMessage(message);
+        try {
+            List<if4031.common.Message> remoteMessages = thriftClient.sendMessage(user, sendMessage);
+
+            return remoteToLocalMessages(remoteMessages);
+
+        } catch (TException e) {
+            throw new RPCException(e);
+        }
     }
 
     @Override
     public void leaveChannel(int user, String channel) throws RPCException {
-
+        try {
+            thriftClient.leaveChannel(user, channel);
+        } catch (TException e) {
+            throw new RPCException(e);
+        }
     }
 }
