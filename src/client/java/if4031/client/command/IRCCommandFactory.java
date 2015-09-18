@@ -29,16 +29,20 @@ public class IRCCommandFactory {
         }
     }
 
+    /**
+     * Parse IRC Command.
+     * format of a command: /<command> <params> or @<channelName> <message> or \<message> or <message>
+     * <command> = nick|join|leave|exit|refresh
+     * for nick command, <params> = <nickname>
+     * for join|leave command, <params> = <channelName>
+     * for exit|refresh command, <params> = <EMPTY>
+     * <nickname>|<channelName> = <WORD>
+     * <message> = <STRING>
+     *
+     * @param line the line to be parsed
+     * @return ParseResult
+     */
     public ParseResult parse(String line) {
-        /*
-        format of a command: /<command> <params> or @<channelName> <message> or \<message> or <message>
-        <command> = nick|join|leave|exit|refresh
-        for nick command, <params> = <nickname>
-        for join|leave command, <params> = <channelName>
-        for exit|refresh command, <params> = <EMPTY>
-        <nickname>|<channelName> = <WORD>
-        <message> = <STRING>
-        */
         if (line.length() == 0) {
             return new ParseResult(ParseStatus.IGNORE, IGNORE_TEXT, null);
         }
@@ -56,37 +60,53 @@ public class IRCCommandFactory {
             case '/': {
                 String[] tokens = line.substring(1).split("\\s+");
                 if (tokens.length == 1) {
-                    String firstToken = tokens[0].toLowerCase();
-                    if (firstToken.equals("exit")) {
-                        return new ParseResult(ParseStatus.EXIT, "", null);
+                    String command = tokens[0].toLowerCase();
+                    if (command.equals("exit")) {
+                        return new ParseResult(ParseStatus.EXIT, EXIT_TEXT, null);
+                    }
+                    if (command.equals("refresh")) {
+                        return new ParseResult(ParseStatus.OK, OK_TEXT, new GetMessagesCommand());
                     }
 
-                } else {
-                    return new ParseResult(ParseStatus.ERROR, "Command not found", null);
+                } else if (tokens.length == 2) {
+                    String command = tokens[0].toLowerCase();
+                    if (command.equals("nick")) {
+                        String newNickname = tokens[1];
+                        return new ParseResult(ParseStatus.OK, OK_TEXT, new ChangeNicknameCommand(newNickname));
+
+                    }
+                    if (command.equals("join")) {
+                        String channelName = tokens[1];
+                        return new ParseResult(ParseStatus.OK, OK_TEXT, new JoinChannelCommand(channelName));
+
+                    }
+                    if (command.equals("leave")) {
+                        String channelName = tokens[1];
+                        return new ParseResult(ParseStatus.OK, OK_TEXT, new LeaveChannelCommand(channelName));
+                    }
                 }
+                return new ParseResult(ParseStatus.ERROR, ERROR_COMMAND_NOTFOUND, null);
             }
 
             /*
-            format of a command: /<command> <params> or @<channelName> <message> or \<message> or <message>
-            <command> = nick|join|leave|exit|refresh
-            for nick command, <params> = <nickname>
-            for join|leave command, <params> = <channelName>
-            for exit|refresh command, <params> = <EMPTY>
-            <nickname>|<channelName> = <WORD>
+            handles line format: @<channelName> <message>
+            <channelName> = <WORD>
             <message> = <STRING>
             */
             case '@': {
-                // split string in two with the first occurence of a space, discarding the space itself.
+                // split string in two with the first occurrence of a space, discarding the space itself.
                 int firstSpaceIdx = line.indexOf(" ");
                 String channelName = line.substring(1, firstSpaceIdx);
-                if (channelName.equals("")) {
-                    return new ParseResult(ParseStatus.ERROR, "Channel name is empty", null);
-                }
                 String message = line.substring(firstSpaceIdx + 1);
-                if (message.equals("")) {
-                    return new ParseResult(ParseStatus.ERROR, "Message is empty", null);
+
+                if (channelName.equals("")) {
+                    return new ParseResult(ParseStatus.ERROR, ERROR_EMPTY_CHANNELNAME, null);
                 }
-                return new ParseResult(ParseStatus.OK, "", new SendMessageChannel(channelName, message));
+                if (message.equals("")) {
+                    return new ParseResult(ParseStatus.ERROR, ERROR_EMPTY_MESSAGE, null);
+                }
+
+                return new ParseResult(ParseStatus.OK, OK_TEXT, new SendMessageChannel(channelName, message));
             }
 
             /*
@@ -94,13 +114,27 @@ public class IRCCommandFactory {
             <message> = <STRING>
             */
             case '\\': {
+                String message = line.substring(1);
+                if (message.equals("")) {
+                    return new ParseResult(ParseStatus.ERROR, ERROR_EMPTY_MESSAGE, null);
+                }
 
+                return new ParseResult(ParseStatus.OK, OK_TEXT, new SendMessageAll(message));
             }
 
+            /*
+            handles line format: <message>
+            <message> = <STRING>
+            */
             default:
-                return new ParseResult(ParseStatus.ERROR, "First character is not '/' or '@'", null);
+                return new ParseResult(ParseStatus.OK, OK_TEXT, new SendMessageAll(line));
         }
     }
 
     private static String IGNORE_TEXT = "nothing entered";
+    private static String OK_TEXT = "";
+    private static String EXIT_TEXT = "";
+    private static String ERROR_EMPTY_MESSAGE = "Message is empty";
+    private static String ERROR_COMMAND_NOTFOUND = "Command not found";
+    private static String ERROR_EMPTY_CHANNELNAME = "Channel name is empty";
 }
