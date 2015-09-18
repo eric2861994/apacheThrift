@@ -1,5 +1,6 @@
 package if4031.client;
 
+import if4031.client.command.Command;
 import if4031.client.command.IRCCommandFactory;
 
 import java.io.PrintStream;
@@ -31,8 +32,8 @@ class IRCClient {
         // main loop
         while (true) {
             out.print(COMMAND_PROMPT);
-            String command = scanner.nextLine();
-            IRCCommandFactory.ParseResult parseResult = ircCommandFactory.parse(command);
+            String line = scanner.nextLine();
+            IRCCommandFactory.ParseResult parseResult = ircCommandFactory.parse(line);
 
             IRCCommandFactory.ParseStatus status = parseResult.getStatus();
             if (status == IRCCommandFactory.ParseStatus.EXIT) {
@@ -42,7 +43,9 @@ class IRCClient {
 
 
             if (status == IRCCommandFactory.ParseStatus.OK) {
+                Command command = parseResult.getCommand();
                 out.println("command: " + parseResult.getCommand());
+                command.execute();
 
             } else if (status == IRCCommandFactory.ParseStatus.IGNORE) {
                 // reprompt without any message
