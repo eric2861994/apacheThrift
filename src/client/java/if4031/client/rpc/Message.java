@@ -1,6 +1,6 @@
 package if4031.client.rpc;
 
-class Message {
+public class Message {
 
     private final String sender;
     private final String channel;
