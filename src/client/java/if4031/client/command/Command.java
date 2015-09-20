@@ -12,5 +12,5 @@ public interface Command {
     /**
      * Execute the command.
      */
-    void execute(IRCClient ircClient, RPCClient rpcClient) throws RPCException;
+    void execute(IRCClient ircClient) throws RPCException;
 }

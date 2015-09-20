@@ -1,5 +1,7 @@
 package if4031.client.command;
 
+import if4031.client.IRCClient;
+
 class SendMessageAll implements Command {
     private final String message;
 
@@ -8,7 +10,7 @@ class SendMessageAll implements Command {
     }
 
     @Override
-    public void execute() {
+    public void execute(IRCClient ircClient) {
         // TODO impl
     }
 
