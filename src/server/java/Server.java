@@ -1,6 +1,7 @@
 import if4031.common.IRCService;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TSimpleServer;
+import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 
@@ -33,7 +34,7 @@ public class Server {
     public static void listener (IRCService.Processor processor) {
         try {
             TServerTransport tServerTransport = new TServerSocket(9090);
-            TServer tserver = new TSimpleServer(new TServer.Args(tServerTransport).processor(processor));
+            TServer tserver = new TThreadPoolServer(new TThreadPoolServer.Args(tServerTransport).processor(processor));
             System.out.println("server starts...");
             tserver.serve();
         } catch (Exception ex) {

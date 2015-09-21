@@ -14,7 +14,7 @@ public class IRCUser {
     private String nickname;
 
     public IRCUser(int userId, String nickname) {
-        this.setIrcChannelNames(null);
+        this.setIrcChannelNames(new ArrayList<String>());
         this.setMessages(new ArrayList<Message>());
         this.setUserId(userId);
         this.setNickname(nickname);
@@ -52,9 +52,9 @@ public class IRCUser {
         this.nickname = nickname;
     }
 
-//    public void deleteMessage() {
-//        this.setMessages(new ArrayList<Message>());
-//    }
+    public void deleteMessage() {
+        this.setMessages(new ArrayList<Message>());
+    }
 
     public void addIRCChannels(String newircChannel) {
         this.getIrcChannelNames().add(newircChannel);

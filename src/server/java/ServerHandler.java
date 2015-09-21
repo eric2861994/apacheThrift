@@ -2,6 +2,8 @@ import exception.ChannelException;
 import if4031.common.IRCService;
 import if4031.common.Message;
 import org.apache.thrift.TException;
+import org.slf4j.Logger;
+import org.slf4j.impl.Log4jLoggerAdapter;
 
 import java.util.List;
 
@@ -16,6 +18,7 @@ public class ServerHandler implements IRCService.Iface {
 
     @Override
     public int login(String nickname) throws TException {
+        System.out.println("Login at server handler");
         return ircData.login(nickname);
     }
 
@@ -26,6 +29,7 @@ public class ServerHandler implements IRCService.Iface {
 
     @Override
     public void logout(int user) throws TException {
+        System.out.println("Login at server handler");
         ircData.logout(user);
     }
 

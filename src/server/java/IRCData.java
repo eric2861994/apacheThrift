@@ -49,7 +49,7 @@ public class IRCData {
 
     public IRCChannel findIRCChannel (String channel) {
         for (IRCChannel ircChannel : this.getIrcChannels()) {
-            if (ircChannel.equals(channel)) {
+            if (ircChannel.getChannelName().equals(channel)) {
                 return ircChannel;
             }
         }
@@ -106,7 +106,11 @@ public class IRCData {
     public void logout(int user) {
         IRCUser ircUser = this.findIRCUserByUserId(user);
         this.getIrcUsers().remove(ircUser);
-        this.getIrcChannels().remove(ircUser.getUserId());
+        if (this.getIrcChannels().size() > 0) {
+            for (IRCChannel ircChannel : this.getIrcChannels()) {
+                ircChannel.removeUser(ircUser.getUserId());
+            }
+        }
     }
 
     public void joinChannel(int user, String channel) throws ChannelException {
@@ -143,7 +147,9 @@ public class IRCData {
 
     public List<Message> sendMessageToChannel(int user, String channel, Message message) {
         IRCUser myIRCUser = this.findIRCUserByUserId(user);
-        myIRCUser.addMessage(message);
+        message.setSender(myIRCUser.getNickname());
+        message.setChannel(channel);
+        message.setSendTime(System.currentTimeMillis());
 
         IRCChannel ircChannel = this.findIRCChannel(channel);
         List<Integer> recipients = ircChannel.getIntegers();
@@ -153,16 +159,20 @@ public class IRCData {
                 ircUser.addMessage(message);
             }
         }
-        return myIRCUser.getMessages();
+        List<Message> ret = new ArrayList<Message>(myIRCUser.getMessages());
+        myIRCUser.deleteMessage();
+        return ret;
     }
 
     public List<Message> sendMessage(int user, Message message) {
         IRCUser myIRCUser = this.findIRCUserByUserId(user);
+        message.setSender(myIRCUser.getNickname());
+        message.setSendTime(System.currentTimeMillis());
         myIRCUser.addMessage(message);
 
         List<String> ircChannelNames = myIRCUser.getIrcChannelNames();
         for (String ircChannelName : ircChannelNames) {
-
+            message.setChannel(ircChannelName);
             IRCChannel ircChannel = this.findIRCChannel(ircChannelName);
             List<Integer> recipients = ircChannel.getIntegers();
             for (Integer recipient : recipients) {

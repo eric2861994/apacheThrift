@@ -44,11 +44,9 @@ public class IRCChannel {
         }
     }
 
-    public void removeUser(Integer integer) throws ChannelException {
+    public void removeUser(Integer integer)  {
         if (integers.contains(integer)) {
             integers.remove(integer);
-        } else {
-            throw new ChannelException("user didn't in the channel");
         }
     }
 
