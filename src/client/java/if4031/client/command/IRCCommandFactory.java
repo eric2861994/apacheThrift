@@ -2,7 +2,7 @@ package if4031.client.command;
 
 public class IRCCommandFactory {
     public enum ParseStatus {
-        OK, ERROR, EXIT, IGNORE
+        OK, ERROR
     }
 
     public class ParseResult {
@@ -39,14 +39,10 @@ public class IRCCommandFactory {
      * <nickname>|<channelName> = <WORD>
      * <message> = <STRING>
      *
-     * @param line the line to be parsed
+     * @param line pre line.length() > 0, the line to be parsed
      * @return ParseResult
      */
     public ParseResult parse(String line) {
-        if (line.length() == 0) {
-            return new ParseResult(ParseStatus.IGNORE, IGNORE_TEXT, null);
-        }
-
         // line must contains at least one character
         switch (line.charAt(0)) {
             /*
@@ -61,9 +57,6 @@ public class IRCCommandFactory {
                 String[] tokens = line.substring(1).split("\\s+");
                 if (tokens.length == 1) {
                     String command = tokens[0].toLowerCase();
-                    if (command.equals("exit")) {
-                        return new ParseResult(ParseStatus.EXIT, EXIT_TEXT, null);
-                    }
                     if (command.equals("refresh")) {
                         return new ParseResult(ParseStatus.OK, OK_TEXT, new GetMessagesCommand());
                     }
@@ -131,9 +124,7 @@ public class IRCCommandFactory {
         }
     }
 
-    private static String IGNORE_TEXT = "nothing entered";
     private static String OK_TEXT = "";
-    private static String EXIT_TEXT = "";
     private static String ERROR_EMPTY_MESSAGE = "Message is empty";
     private static String ERROR_COMMAND_NOTFOUND = "Command not found";
     private static String ERROR_EMPTY_CHANNELNAME = "Channel name is empty";

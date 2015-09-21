@@ -15,12 +15,12 @@ class SendMessageChannel implements Command {
     }
 
     @Override
-    public void execute(IRCClient ircClient) {
-        // TODO impl
+    public String toString() {
+        return '@' + channelName + ' ' + message;
     }
 
     @Override
-    public String toString() {
-        return '@' + channelName + ' ' + message;
+    public void execute(IRCClient ircClient) {
+        ircClient.sendMessageChannel(channelName, message);
     }
 }

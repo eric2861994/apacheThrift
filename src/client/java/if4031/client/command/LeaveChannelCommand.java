@@ -10,12 +10,12 @@ class LeaveChannelCommand implements Command {
     }
 
     @Override
-    public void execute(IRCClient ircClient) {
-        // TODO impl
+    public String toString() {
+        return "/leave " + channelName;
     }
 
     @Override
-    public String toString() {
-        return "/leave " + channelName;
+    public void execute(IRCClient ircClient) {
+        ircClient.leaveChannel(channelName);
     }
 }

@@ -1,16 +1,21 @@
 package if4031.client;
 
-import if4031.client.command.IRCCommandFactory;
-import if4031.client.rpc.RPCException;
+import if4031.client.rpc.Message;
+import org.apache.thrift.transport.TTransportException;
 
 import java.io.PrintStream;
+import java.util.List;
+import java.util.Queue;
 import java.util.Scanner;
+import java.util.concurrent.LinkedBlockingQueue;
 
-class CLInterface {
+class CLInterface implements IRCClientListener {
 
     private final Scanner scanner;
     private final PrintStream out;
     private final IRCClient ircClient;
+
+    private Queue<String> messagesQ = new LinkedBlockingQueue<>();
 
     CLInterface(Scanner _scanner, PrintStream _out, IRCClient _ircClient) {
         scanner = _scanner;
@@ -18,7 +23,7 @@ class CLInterface {
         ircClient = _ircClient;
     }
 
-    private void run() throws RPCException {
+    private void run() {
         // display welcome message
         out.println(WELCOME_MESSAGE);
 
@@ -35,33 +40,85 @@ class CLInterface {
 
         // main loop
         String commandString;
-        IRCCommandFactory.ParseStatus status;
-        do {
+        while (true) {
             out.print(COMMAND_PROMPT);
             commandString = scanner.nextLine();
 
-            IRCClient.ParseExecuteResult parseExecuteResult = ircClient.parseExecute(commandString);
-            status = parseExecuteResult.getStatus();
-            if (status == IRCCommandFactory.ParseStatus.ERROR) {
-                out.println(ERROR_MESSAGE);
-                // TODO impl more robust error handling
+            if (commandString.equals("/exit")) {
+                break;
             }
-        } while (status != IRCCommandFactory.ParseStatus.EXIT);
+
+            if (commandString.equals("")) {
+                // TODO impl
+
+            } else {
+                ircClient.parseExecute(commandString);
+            }
+
+            while (!messagesQ.isEmpty()) {
+                out.println(messagesQ.remove());
+            }
+        }
 
         ircClient.logout();
         // TODO handle logout failure
     }
 
-    public static void main(String[] args) throws RPCException {
-        String serverAddress = args[1];
-        int serverPort = Integer.parseInt(args[2]);
-        int refreshTime = Integer.parseInt(args[0]);
+    @Override
+    public void notifyFailure(int failureCode, String reason) {
+        messagesQ.add("Failure " + failureCode + ": " + reason);
+    }
+
+    @Override
+    public void notifyLeaveChannel(String channelName) {
+        messagesQ.add("Left channel: " + channelName);
+    }
+
+    @Override
+    public void notifyJoinChannel(String channelName) {
+        messagesQ.add("Joined channel: " + channelName);
+    }
+
+    @Override
+    public void notifyLogin() {
+        messagesQ.add("Logged in.");
+    }
+
+    @Override
+    public void notifyLogout() {
+        messagesQ.add("Logged out.");
+    }
+
+    @Override
+    public void notifyMessageArrive(List<Message> messages) {
+        for (Message m : messages) {
+            messagesQ.add("[" + m.getSendTime() + " ] #" + m.getChannel() + " (" + m.getSender() + "): " + m.getBody());
+        }
+    }
+
+    @Override
+    public void notifyNicknameChange(String newNickname) {
+        messagesQ.add("Nickname changed to " + newNickname);
+    }
+
+    public static void main(String[] args) throws TTransportException {
+//        String serverAddress = args[1];
+        String serverAddress = "localhost";
+//        int serverPort = Integer.parseInt(args[2]);
+        int serverPort = 9090;
+//        int refreshTime = Integer.parseInt(args[0]);
+        int refreshTime = 5;
+
         // TODO handle user input robustly
         IRCClient ircClient = new IRCClient(serverAddress, serverPort, refreshTime);
 
         Scanner scanner = new Scanner(System.in);
-        CLInterface CLInterface = new CLInterface(scanner, System.out, ircClient);
-        CLInterface.run();
+        CLInterface clInterface = new CLInterface(scanner, System.out, ircClient);
+        ircClient.setIrcClientListener(clInterface);
+
+        ircClient.start();
+        clInterface.run();
+        ircClient.stop();
     }
 
     private static String PROGRAM_NAME = "Apache Thrift IRC";

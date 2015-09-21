@@ -1,7 +1,6 @@
 package if4031.client.command;
 
 import if4031.client.IRCClient;
-import if4031.client.rpc.RPCException;
 
 class ChangeNicknameCommand implements Command {
     private String newNickname;
@@ -16,7 +15,7 @@ class ChangeNicknameCommand implements Command {
     }
 
     @Override
-    public void execute(IRCClient ircClient) throws RPCException {
-        // TODO impl
+    public void execute(IRCClient ircClient) {
+        ircClient.changeNickname(newNickname);
     }
 }

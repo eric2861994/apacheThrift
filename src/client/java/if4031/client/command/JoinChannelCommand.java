@@ -1,7 +1,6 @@
 package if4031.client.command;
 
 import if4031.client.IRCClient;
-import if4031.client.rpc.RPCException;
 
 class JoinChannelCommand implements Command {
     private final String channelName;
@@ -16,7 +15,7 @@ class JoinChannelCommand implements Command {
     }
 
     @Override
-    public void execute(IRCClient ircClient) throws RPCException {
-        // TODO impl
+    public void execute(IRCClient ircClient) {
+        ircClient.joinChannel(channelName);
     }
 }

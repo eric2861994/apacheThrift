@@ -10,12 +10,12 @@ class SendMessageAll implements Command {
     }
 
     @Override
-    public void execute(IRCClient ircClient) {
-        // TODO impl
+    public String toString() {
+        return '\\' + message;
     }
 
     @Override
-    public String toString() {
-        return '\\' + message;
+    public void execute(IRCClient ircClient) {
+        ircClient.sendMessageAll(message);
     }
 }
