@@ -32,10 +32,10 @@ public class Server {
 
     public static void listener (IRCService.Processor processor) {
         try {
-            TServerTransport tServerTransport = new TServerSocket(9026);
+            TServerTransport tServerTransport = new TServerSocket(9090);
             TServer tserver = new TSimpleServer(new TServer.Args(tServerTransport).processor(processor));
-            tserver.serve();
             System.out.println("server starts...");
+            tserver.serve();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
