@@ -56,11 +56,11 @@ public class IRCClient {
 
     private void monitorThreadState() {
         if (clientState == ClientState.JOINED_CHANNEL &&
-                executorService.getStatus() == RestartableSingleExecutor.ServiceState.STARTED) {
+                executorService.getStatus() == RestartableSingleExecutor.ServiceState.STOPPED) {
             executorService.restart();
 
         } else if (clientState != ClientState.JOINED_CHANNEL &&
-                executorService.getStatus() == RestartableSingleExecutor.ServiceState.STOPPED) {
+                executorService.getStatus() == RestartableSingleExecutor.ServiceState.STARTED) {
             executorService.stop();
         }
     }

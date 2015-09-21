@@ -148,6 +148,7 @@ public class IRCData {
     public List<Message> getMessage(int user) {
         IRCUser ircUser = this.findIRCUserByUserId(user);
         List<Message> messages = new ArrayList<Message> (ircUser.getMessages());
+        ircUser.deleteMessageAtAllChannel();
         return messages;
     }
 

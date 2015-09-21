@@ -107,12 +107,12 @@ class CLInterface implements IRCClientListener {
     }
 
     public static void main(String[] args) throws TTransportException {
-//        String serverAddress = args[1];
-//        int serverPort = Integer.parseInt(args[2]);
-//        int refreshTime = Integer.parseInt(args[0]);
-        String serverAddress = "localhost";
-        int serverPort = 9090;
-        int refreshTime = 5;
+        String serverAddress = args[1];
+        int serverPort = Integer.parseInt(args[2]);
+        int refreshTime = Integer.parseInt(args[0]);
+//        String serverAddress = "localhost";
+//        int serverPort = 9090;
+//        int refreshTime = 5000;
 
         // TODO handle user input robustly
         IRCClient ircClient = new IRCClient(serverAddress, serverPort, refreshTime);
