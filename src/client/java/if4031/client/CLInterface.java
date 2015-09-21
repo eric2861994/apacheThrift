@@ -97,7 +97,7 @@ class CLInterface implements IRCClientListener {
     @Override
     public void notifyMessageArrive(List<Message> messages) {
         for (Message m : messages) {
-            messagesQ.add("[" + m.getSendTime() + " ] #" + m.getChannel() + " (" + m.getSender() + "): " + m.getBody());
+            messagesQ.add("[" + m.getChannel() + "] (" + m.getSender() + "): " + m.getBody());
         }
     }
 

@@ -21,24 +21,29 @@ public class IRCClient {
     private final IRCCommandFactory ircCommandFactory = new IRCCommandFactory();
     private final RPCClient rpcClient;
     private final TTransport transport;
+    private final RestartableSingleExecutor executorService;
+
     private IRCClientListener ircClientListener;
 
     private String nickname;
     private int userID;
-    private int refreshTime; // in milliseconds
-    private int channelCount = 0;
+    private int channelCount;
 
     private ClientState clientState = ClientState.LOGGED_OUT;
-    private ThreadState threadState = ThreadState.STOPPED;
 
-    IRCClient(String server, int port, int _refreshTime) {
+    IRCClient(String server, int port, int refreshTime) {
         transport = new TSocket(server, port);
         TProtocol protocol = new TBinaryProtocol(transport);
         IRCService.Client client = new IRCService.Client(protocol);
 
         rpcClient = new ThriftRPCClient(client);
 
-        refreshTime = _refreshTime;
+        executorService = new RestartableSingleExecutor(new Runnable() {
+            @Override
+            public void run() {
+                realGetMessages();
+            }
+        }, refreshTime);
     }
 
     void start() throws TTransportException {
@@ -50,13 +55,13 @@ public class IRCClient {
     }
 
     private void monitorThreadState() {
-        if (clientState == ClientState.JOINED_CHANNEL && threadState == ThreadState.STOPPED) {
-            // TODO impl
-            threadState = ThreadState.STARTED;
+        if (clientState == ClientState.JOINED_CHANNEL &&
+                executorService.getStatus() == RestartableSingleExecutor.ServiceState.STARTED) {
+            executorService.restart();
 
-        } else if (clientState != ClientState.JOINED_CHANNEL && threadState == ThreadState.STARTED) {
-            // TODO impl
-            threadState = ThreadState.STOPPED;
+        } else if (clientState != ClientState.JOINED_CHANNEL &&
+                executorService.getStatus() == RestartableSingleExecutor.ServiceState.STOPPED) {
+            executorService.stop();
         }
     }
 
@@ -82,14 +87,23 @@ public class IRCClient {
         }
     }
 
-    public void getMessages() {
-        List<Message> messages = null;
+    private void realGetMessages() {
         try {
-            messages = rpcClient.getMessages(userID);
+            List<Message> messages = rpcClient.getMessages(userID);
             ircClientListener.notifyMessageArrive(messages);
 
         } catch (RPCException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void getMessages() {
+        if (executorService.getStatus() == RestartableSingleExecutor.ServiceState.STARTED) {
+            executorService.restart();
+
+        } else {
+            // TODO harusnya ini tidak penah terjadi
+            realGetMessages();
         }
     }
 
@@ -178,10 +192,5 @@ public class IRCClient {
         JOINED_CHANNEL,
         LOGGED_IN,
         LOGGED_OUT
-    }
-
-    private enum ThreadState {
-        STARTED,
-        STOPPED
     }
 }
