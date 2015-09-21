@@ -23,6 +23,12 @@ class CLInterface implements IRCClientListener {
         ircClient = _ircClient;
     }
 
+    private void printMessages() {
+        while (!messagesQ.isEmpty()) {
+            out.println(messagesQ.remove());
+        }
+    }
+
     private void run() {
         // display welcome message
         out.println(WELCOME_MESSAGE);
@@ -41,6 +47,8 @@ class CLInterface implements IRCClientListener {
         // main loop
         String commandString;
         while (true) {
+            printMessages();
+
             out.print(COMMAND_PROMPT);
             commandString = scanner.nextLine();
 
@@ -54,13 +62,10 @@ class CLInterface implements IRCClientListener {
             } else {
                 ircClient.parseExecute(commandString);
             }
-
-            while (!messagesQ.isEmpty()) {
-                out.println(messagesQ.remove());
-            }
         }
 
         ircClient.logout();
+        printMessages();
         // TODO handle logout failure
     }
 
@@ -103,10 +108,10 @@ class CLInterface implements IRCClientListener {
 
     public static void main(String[] args) throws TTransportException {
 //        String serverAddress = args[1];
-        String serverAddress = "localhost";
 //        int serverPort = Integer.parseInt(args[2]);
-        int serverPort = 9090;
 //        int refreshTime = Integer.parseInt(args[0]);
+        String serverAddress = "localhost";
+        int serverPort = 9090;
         int refreshTime = 5;
 
         // TODO handle user input robustly

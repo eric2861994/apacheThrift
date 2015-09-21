@@ -170,7 +170,7 @@ public class IRCClient {
         IRCCommandFactory.ParseStatus status = parseResult.getStatus();
         if (status == IRCCommandFactory.ParseStatus.OK) {
             Command command = parseResult.getCommand();
-//            command.execute();
+            command.execute(this);
         }
     }
 
