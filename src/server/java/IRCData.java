@@ -98,9 +98,26 @@ public class IRCData {
 
     public int login(String nickname) {
         int uid = this.generateUserId();
-        IRCUser ircUser = new IRCUser(uid, nickname);
-        this.ircUsers.add(ircUser);
-        return uid;
+        if (this.isNicknameExists(nickname)) {
+            return -1;
+        } else {
+            IRCUser ircUser = new IRCUser(uid, nickname);
+            this.ircUsers.add(ircUser);
+            return uid;
+        }
+    }
+
+    private boolean isNicknameExists(String nickname) {
+        return (this.findIRCUserByNickname(nickname) != null);
+    }
+
+    private IRCUser findIRCUserByNickname(String nickname) {
+        for (IRCUser ircuser : this.getIrcUsers()) {
+            if (ircuser.getNickname().equals(nickname)) {
+                return ircuser;
+            }
+        }
+        return null;
     }
 
     public void logout(int user) {
@@ -152,23 +169,35 @@ public class IRCData {
         message.setSendTime(System.currentTimeMillis());
 
         IRCChannel ircChannel = this.findIRCChannel(channel);
-        List<Integer> recipients = ircChannel.getIntegers();
-        for (Integer recipient : recipients) {
-            if (recipient != null) {
-                IRCUser ircUser = this.findIRCUserByUserId(recipient);
-                ircUser.addMessage(message);
+        if (ircChannel != null) {
+            List<Integer> recipients = ircChannel.getIntegers();
+            for (Integer recipient : recipients) {
+                if (recipient != null) {
+                    IRCUser ircUser = this.findIRCUserByUserId(recipient);
+                    ircUser.addMessage(message);
+                }
             }
         }
-        List<Message> ret = new ArrayList<Message>(myIRCUser.getMessages());
-        myIRCUser.deleteMessage();
+        List<Message> ret = new ArrayList<>(myIRCUser.getMessages());
+        myIRCUser.deleteMessageAtAllChannel();
         return ret;
+
+//        List<Message> ms = myIRCUser.getMessages();
+//        List<Message> retms = new ArrayList<>();
+//        for (Message m : ms) {
+//            if (m.getChannel().equals(channel)) {
+//                retms.add(new Message(m));
+//            }
+//        }
+//
+//        myIRCUser.deleteMessageAtChannel(channel);
+//        return retms;
     }
 
     public List<Message> sendMessage(int user, Message message) {
         IRCUser myIRCUser = this.findIRCUserByUserId(user);
         message.setSender(myIRCUser.getNickname());
         message.setSendTime(System.currentTimeMillis());
-        myIRCUser.addMessage(message);
 
         List<String> ircChannelNames = myIRCUser.getIrcChannelNames();
         for (String ircChannelName : ircChannelNames) {
@@ -182,6 +211,8 @@ public class IRCData {
                 }
             }
         }
-        return myIRCUser.getMessages();
+        List<Message> ret = new ArrayList<>(myIRCUser.getMessages());
+        myIRCUser.deleteMessageAtAllChannel();
+        return ret;
     }
 }

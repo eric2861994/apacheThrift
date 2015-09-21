@@ -52,8 +52,14 @@ public class IRCUser {
         this.nickname = nickname;
     }
 
-    public void deleteMessage() {
-        this.setMessages(new ArrayList<Message>());
+    public void deleteMessageAtChannel(String channel) {
+        List<Message> newMessage = new ArrayList<Message>();
+        for (Message m : this.getMessages()) {
+            if (!m.getChannel().equals(channel)) {
+                newMessage.add(new Message(m));
+            }
+        }
+        this.setMessages(newMessage);
     }
 
     public void addIRCChannels(String newircChannel) {
@@ -74,5 +80,9 @@ public class IRCUser {
 
     public void addMessage(Message message) {
         this.getMessages().add(message);
+    }
+
+    public void deleteMessageAtAllChannel() {
+        this.setMessages(new ArrayList<Message>());
     }
 }
