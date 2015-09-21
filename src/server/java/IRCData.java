@@ -207,7 +207,7 @@ public class IRCData {
             for (Integer recipient : recipients) {
                 if (recipient != null) {
                     IRCUser ircUser = this.findIRCUserByUserId(recipient);
-                    ircUser.addMessage(message);
+                    ircUser.addMessage(new Message(message));
                 }
             }
         }
