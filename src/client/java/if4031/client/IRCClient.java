@@ -2,6 +2,8 @@ package if4031.client;
 
 import if4031.client.command.Command;
 import if4031.client.command.IRCCommandFactory;
+import if4031.client.executor.DelayableRepeatingExecutor;
+import if4031.client.executor.ToleratingTimedExecutor;
 import if4031.client.rpc.Message;
 import if4031.client.rpc.RPCClient;
 import if4031.client.rpc.RPCException;
@@ -21,46 +23,49 @@ public class IRCClient {
     private final IRCCommandFactory ircCommandFactory = new IRCCommandFactory();
     private final RPCClient rpcClient;
     private final TTransport transport;
-    private final RestartableSingleExecutor executorService;
+    private final ToleratingTimedExecutor toleratingExecutor;
+    private final DelayableRepeatingExecutor executorService;
 
     private IRCClientListener ircClientListener;
-
     private String nickname;
     private int userID;
     private int channelCount;
 
     private ClientState clientState = ClientState.LOGGED_OUT;
 
-    IRCClient(String server, int port, int refreshTime) {
+    IRCClient(String server, int port, int refreshMillis, int toleranceMillis) {
         transport = new TSocket(server, port);
+
         TProtocol protocol = new TBinaryProtocol(transport);
         IRCService.Client client = new IRCService.Client(protocol);
-
         rpcClient = new ThriftRPCClient(client);
 
-        executorService = new RestartableSingleExecutor(new Runnable() {
+        toleratingExecutor = new ToleratingTimedExecutor(new Runnable() {
             @Override
             public void run() {
                 realGetMessages();
             }
-        }, refreshTime);
+        }, refreshMillis, toleranceMillis);
+        executorService = toleratingExecutor;
     }
 
     void start() throws TTransportException {
         transport.open();
+        toleratingExecutor.initialize();
     }
 
     void stop() {
         transport.close();
+        toleratingExecutor.shutdown();
     }
 
     private void monitorThreadState() {
         if (clientState == ClientState.JOINED_CHANNEL &&
-                executorService.getStatus() == RestartableSingleExecutor.ServiceState.STOPPED) {
-            executorService.restart();
+                executorService.getStatus() == DelayableRepeatingExecutor.ExecutorState.STOPPED) {
+            executorService.start();
 
         } else if (clientState != ClientState.JOINED_CHANNEL &&
-                executorService.getStatus() == RestartableSingleExecutor.ServiceState.STARTED) {
+                executorService.getStatus() == DelayableRepeatingExecutor.ExecutorState.STARTED) {
             executorService.stop();
         }
     }
@@ -98,8 +103,8 @@ public class IRCClient {
     }
 
     public void getMessages() {
-        if (executorService.getStatus() == RestartableSingleExecutor.ServiceState.STARTED) {
-            executorService.restart();
+        if (executorService.getStatus() == DelayableRepeatingExecutor.ExecutorState.STARTED) {
+            executorService.mark();
 
         } else {
             // TODO harusnya ini tidak penah terjadi

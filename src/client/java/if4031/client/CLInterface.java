@@ -1,7 +1,6 @@
 package if4031.client;
 
 import if4031.client.rpc.Message;
-import org.apache.thrift.transport.TTransportException;
 
 import java.io.PrintStream;
 import java.util.List;
@@ -29,7 +28,7 @@ class CLInterface implements IRCClientListener {
         }
     }
 
-    private void run() {
+    void run() {
         // display welcome message
         out.println(WELCOME_MESSAGE);
 
@@ -106,25 +105,7 @@ class CLInterface implements IRCClientListener {
         messagesQ.add("Nickname changed to " + newNickname);
     }
 
-    public static void main(String[] args) throws TTransportException {
-        String serverAddress = args[1];
-        int serverPort = Integer.parseInt(args[2]);
-        int refreshTime = Integer.parseInt(args[0]);
-//        String serverAddress = "localhost";
-//        int serverPort = 9090;
-//        int refreshTime = 5000;
 
-        // TODO handle user input robustly
-        IRCClient ircClient = new IRCClient(serverAddress, serverPort, refreshTime);
-
-        Scanner scanner = new Scanner(System.in);
-        CLInterface clInterface = new CLInterface(scanner, System.out, ircClient);
-        ircClient.setIrcClientListener(clInterface);
-
-        ircClient.start();
-        clInterface.run();
-        ircClient.stop();
-    }
 
     private static String PROGRAM_NAME = "Apache Thrift IRC";
     private static String WELCOME_MESSAGE = "Welcome to " + PROGRAM_NAME + "!\nEnter your nickname to login..\n";

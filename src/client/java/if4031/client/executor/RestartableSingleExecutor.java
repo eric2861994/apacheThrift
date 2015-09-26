@@ -1,9 +1,10 @@
-package if4031.client;
+package if4031.client.executor;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
 class RestartableSingleExecutor {
     private final Runnable runnable;
     private final int refreshMillis;
